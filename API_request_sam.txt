@@ -1,0 +1,66 @@
+# Grok 3 API 配置示例
+
+## 安全提示
+! 重要：API密钥应该妥善保管，不要直接硬编码在代码中
+建议的做法：
+1. 使用环境变量存储API密钥
+2. 使用配置管理系统
+3. 在生产环境中使用安全的密钥管理服务
+
+## API 端点
+API_ENDPOINT = "https://api.x.ai/v1/chat/completions"
+
+## API 请求头
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer ${API_KEY}
+
+## API 请求格式
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "翻译助手提示词"
+        },
+        {
+            "role": "user",
+            "content": "需要翻译的内容和上下文"
+        }
+    ],
+    "model": "grok-3-latest",
+    "stream": false,
+    "temperature": 0.7
+}
+
+## API 响应格式
+{
+    "id": "response-id",
+    "object": "chat.completion",
+    "created": 1234567890,
+    "model": "grok-3-latest",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": {
+                    "translations": {
+                        "zh_CN": "简体中文翻译结果",
+                        "en_US": "英语翻译结果",
+                        "AR": "阿拉伯语翻译结果",
+                        "TR": "土耳其语翻译结果",
+                        "pt_BR": "巴西葡萄牙语翻译结果",
+                        "es_MX": "墨西哥西班牙语翻译结果",
+                        "TC": "繁体中文翻译结果"
+                    }
+                }
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 456,
+        "total_tokens": 579
+    }
+} 

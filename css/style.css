@@ -1,0 +1,341 @@
+/* 全局样式 */
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    padding: 20px;
+}
+
+/* 玻璃态容器 */
+.glass-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* 玻璃态卡片 */
+.glass-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+    margin-bottom: 20px;
+}
+
+.glass-card .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 15px 15px 0 0;
+}
+
+/* 表格样式 */
+.table {
+    color: #fff;
+    user-select: text; /* 允许选择文本 */
+    table-layout: fixed; /* 固定表格布局 */
+    width: 100%; /* 确保表格占满容器 */
+}
+
+.table thead th {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1);
+    user-select: none; /* 表头不可选择 */
+    cursor: pointer; /* 添加指针样式 */
+    transition: all 0.2s;
+    position: relative;
+    padding: 12px 8px;
+    text-align: left; /* 左对齐文本 */
+    white-space: nowrap; /* 防止表头换行 */
+    overflow: hidden; /* 隐藏溢出内容 */
+    text-overflow: ellipsis; /* 显示省略号 */
+}
+
+/* 设置列宽 */
+.table thead th:nth-child(1) { width: 15%; } /* 说明列 */
+.table thead th:nth-child(2) { width: 40%; } /* 原文列 */
+.table thead th:nth-child(3) { width: 10%; } /* 操作列 */
+
+/* 结果表格列宽 */
+#resultTable thead th { width: 14.28%; } /* 7列平均分配宽度 */
+
+.table td {
+    border-color: rgba(255, 255, 255, 0.1);
+    vertical-align: middle;
+    padding: 8px;
+    position: relative;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    height: 60px; /* 设置固定高度 */
+}
+
+/* 确保表格行高一致 */
+.table tbody tr {
+    height: 60px; /* 设置固定行高 */
+}
+
+/* 可选择单元格样式 */
+.table td.selectable {
+    cursor: text;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.table td.selectable:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.table td.selectable:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 选中文本样式 */
+.table td.selectable::selection {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+/* 文本框样式 */
+.form-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #fff;
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+    min-height: 60px; /* 设置最小高度 */
+    max-height: 60px; /* 设置最大高度 */
+    line-height: 1.2; /* 减小行高 */
+    padding: 6px 12px; /* 调整内边距 */
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* 按钮样式 */
+.btn {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 加载动画遮罩层 */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    z-index: 9999;
+    padding-top: 220px;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 220px;
+}
+
+.progress-container {
+    width: 300px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.progress {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #6e8efb, #a777e3);
+    transition: width 0.3s ease;
+}
+
+.progress-bar.progress-complete {
+    animation: progressComplete 0.5s ease;
+}
+
+@keyframes progressComplete {
+    0% {
+        transform: scaleX(1);
+    }
+    50% {
+        transform: scaleX(1.05);
+    }
+    100% {
+        transform: scaleX(1);
+    }
+}
+
+.progress-text {
+    color: white;
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.model-info {
+    color: white;
+    font-size: 16px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 15px;
+    border-radius: 8px;
+}
+
+#currentModelName {
+    color: #6e8efb;
+    font-weight: bold;
+}
+
+#cancelTranslation {
+    background: rgba(220, 53, 69, 0.8);
+    border: none;
+    padding: 8px 20px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#cancelTranslation:hover {
+    background: rgba(220, 53, 69, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+#cancelTranslation:active {
+    transform: translateY(0);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 10px;
+    }
+    
+    .glass-card {
+        margin-bottom: 15px;
+    }
+    
+    .table-responsive {
+        margin-bottom: 0;
+    }
+}
+
+/* Toast提示消息样式 */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #fff;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* 切换开关样式 */
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.form-check-label {
+    user-select: none;
+    cursor: pointer;
+}
+
+/* 确保表格响应式 */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 模型选择样式 */
+.model-select-container {
+    width: 150px;
+}
+
+.model-select-container .form-select {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 0.875rem;
+}
+
+.model-select-container .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+}
+
+.model-select-container .form-select option {
+    background-color: #2c3e50;
+    color: #fff;
+} 
