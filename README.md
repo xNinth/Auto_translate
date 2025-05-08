@@ -5,7 +5,9 @@
 ## 项目结构
 
 - **前端**：基于HTML、CSS和JavaScript的多语言翻译界面
-- **后端**：基于Flask的翻译API，部署在Vercel平台
+- **后端**：基于Flask的翻译API，有两种部署选项：
+  - Vercel平台部署（有60秒超时限制）
+  - 阿里云函数计算部署（支持长达10分钟的处理时间）
 
 ## 后端API服务
 
@@ -96,6 +98,31 @@
 3. **部署与更新**:
    - Vercel会自动监测GitHub仓库的变更
    - 每次提交后自动部署
+
+### 部署在阿里云函数计算上
+
+1. **准备工作**:
+   - 创建阿里云账号并开通函数计算服务
+   - 安装Serverless Devs工具：`npm install @serverless-devs/s -g`
+
+2. **配置项目**:
+   - 使用`translate.yaml`配置文件定义HTTP触发函数
+   - 设置环境变量（GROK_API_KEY和DEEPSEEK_API_KEY）
+   - 配置Python 3.10运行时环境
+
+3. **部署流程**:
+   ```bash
+   s deploy -t ./translate.yaml
+   ```
+
+4. **优势**:
+   - 支持长达10分钟（600秒）的处理时间，适合处理大量文本
+   - 支持更高的内存分配（1024MB）
+   - 更稳定的网络连接，不需要翻墙
+
+5. **前端配置**:
+   - 使用`config_aliyun.js`文件替代默认的`config.js`
+   - 修改`main.js`中的导入语句：`import config from './config_aliyun.js';`
 
 ## 常见问题与解决方案
 

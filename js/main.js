@@ -1,5 +1,5 @@
 // 从配置文件导入API配置
-import config from './config.js';
+import config from './config_aliyun.js';
 
 // 语言顺序配置
 const languageOrders = {
