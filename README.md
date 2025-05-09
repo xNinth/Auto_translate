@@ -435,4 +435,137 @@ C:\Users\[用户名]\AppData\Local\GitHubDesktop\app-[版本号]\resources\app\g
 
 - 操作系统：Windows 11
 - 浏览器：Chrome 135.0.7049.85 或更高版本
-- Python 3.x（用于启动本地服务器） 
+- Python 3.x（用于启动本地服务器）
+
+# 自动翻译前端
+
+这是一个基于HTML、CSS和JavaScript开发的自动翻译前端界面，用于与后端API服务进行交互，实现多语言翻译功能。
+
+## 功能特点
+
+- 现代化的响应式界面设计
+- 支持多种翻译模型的选择
+- 批量翻译功能
+- 实时翻译进度显示
+- 翻译结果的复制和排序
+- 取消正在进行的翻译
+
+## 支持的模型
+
+系统目前支持以下翻译模型：
+
+1. **Deepseek-V3**：默认模型，提供高质量的多语言翻译
+2. **GPT-4O**：OpenAI的高级翻译模型，提供准确的多语言翻译服务
+3. **Grok-3**：xAI开发的翻译模型，需通过特定后端访问
+
+## 多后端支持
+
+前端能够根据选择的模型自动连接到不同的后端服务：
+
+- Deepseek和GPT-4O模型：使用腾讯SCF部署的后端 (`https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com`)
+- Grok模型：使用Vercel部署的后端 (`https://auto-trans2-backend.vercel.app`)
+
+## 使用方法
+
+1. 打开前端页面
+2. 从下拉菜单中选择要使用的翻译模型
+3. 在输入区域添加需要翻译的文本，每行一个
+4. 可以选择为每个文本添加说明，帮助模型更准确地理解翻译上下文
+5. 点击"开始翻译"按钮
+6. 翻译完成后，结果会显示在右侧表格中
+7. 可以使用"复制所有结果"按钮复制翻译结果
+
+## 开发与部署
+
+### 环境要求
+
+- 现代Web浏览器（Chrome, Firefox, Safari, Edge等）
+- 推荐使用GitHub Pages或其他静态网站托管服务
+
+### 部署步骤
+
+1. 将整个项目文件夹上传到GitHub仓库
+2. 启用GitHub Pages服务
+3. 或者直接将文件部署到任何支持静态网站的托管服务上
+
+### 本地开发
+
+1. 克隆项目到本地
+2. 使用Live Server或者任何HTTP服务器启动项目
+3. 修改`js/config.js`文件中的配置以连接到本地或测试环境的后端API
+
+## 配置说明
+
+主要配置文件：`js/config.js`
+
+```javascript
+const config = {
+    // API基础URL - 默认URL
+    API_BASE_URL: 'https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com',
+    
+    // 模型特定API基础URL
+    MODEL_API_URLS: {
+        deepseek: 'https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com',
+        gpt4o: 'https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com',
+        grok: 'https://auto-trans2-backend.vercel.app'
+    },
+    
+    // API端点
+    ENDPOINTS: {
+        translate: '/translate',
+        health: '/'
+    },
+    
+    // 翻译模型配置
+    models: {
+        grok: {
+            name: 'Grok-3',
+            maxLength: 2000
+        },
+        deepseek: {
+            name: 'Deepseek-V3',
+            maxLength: 2000
+        },
+        gpt4o: {
+            name: 'GPT-4O',
+            maxLength: 2000
+        }
+    },
+    
+    // 翻译批次大小限制
+    MAX_CHARS_PER_BATCH: 300,
+    
+    // 请求超时时间（毫秒）
+    TIMEOUT: 594000,
+    
+    // 重试配置
+    RETRY: {
+        maxAttempts: 2,
+        delay: 1000
+    }
+};
+```
+
+## 页面说明
+
+- **输入区域**：用于添加需要翻译的文本及其说明
+- **翻译结果区域**：显示各种语言的翻译结果
+- **模型选择**：在页面顶部的下拉菜单中选择翻译模型
+- **进度指示器**：在翻译过程中显示实时进度
+- **排序切换**：可以在正常顺序和后台接口顺序之间切换显示的结果
+
+## 最近更新
+
+### 2025-05-15
+- 添加GPT-4O模型支持
+- 实现根据模型动态选择后端API地址
+- 优化用户界面，提升用户体验
+- 增强翻译进度显示功能
+
+### 2025-05-09
+- 改进错误处理机制
+- 优化响应式布局，适应不同屏幕尺寸
+- 增加取消翻译功能
+
+### 2025-05-08
+- 初始版本发布 

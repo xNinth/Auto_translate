@@ -1,7 +1,14 @@
 // API配置
 const config = {
-    // API基础URL
+    // API基础URL - 默认URL，将根据模型动态选择
     API_BASE_URL: 'https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com',
+    
+    // 模型特定API基础URL
+    MODEL_API_URLS: {
+        deepseek: 'https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com',
+        gpt4o: 'https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com',
+        grok: 'https://auto-trans2-backend.vercel.app'
+    },
     
     // API端点
     ENDPOINTS: {
@@ -17,6 +24,10 @@ const config = {
         },
         deepseek: {
             name: 'Deepseek-V3',
+            maxLength: 2000
+        },
+        gpt4o: {
+            name: 'GPT-4O',
             maxLength: 2000
         }
     },

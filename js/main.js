@@ -186,14 +186,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 description: description // 添加说明字段
             };
             
+            // 根据模型选择对应的API URL
+            const apiBaseUrl = config.MODEL_API_URLS[selectedModel] || config.API_BASE_URL;
+            
             console.log(`[DEBUG] 发送请求详情:`);
             console.log(`- 模型: ${selectedModel}`);
             console.log(`- 原文: "${originalText}"`);
             console.log(`- 说明: "${description}"`);
-            console.log(`- URL: ${config.API_BASE_URL}${config.ENDPOINTS.translate}`);
+            console.log(`- URL: ${apiBaseUrl}${config.ENDPOINTS.translate}`);
             
             // 发送请求
-            const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.translate}`, {
+            const response = await fetch(`${apiBaseUrl}${config.ENDPOINTS.translate}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
