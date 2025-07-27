@@ -3,8 +3,8 @@ import config from './config.js';
 
 // 语言顺序配置
 const languageOrders = {
-    normal: ['zh_CN', 'en_US', 'AR', 'TR', 'pt_BR', 'es_MX', 'TC', 'fr_FR', 'id_ID'],
-    backend: ['zh_CN', 'TC', 'en_US', 'ar', 'tr', 'es_MX', 'pt_BR', 'fr_fr', 'id_id']
+    normal: ['zh_CN', 'en_US', 'ar_AE', 'tr_TR', 'pt_BR', 'es_MX', 'zh_TW', 'fr_FR', 'id_ID'],
+    backend: ['zh_CN', 'zh_TW', 'en_US', 'ar_AE', 'tr_TR', 'es_MX', 'pt_BR', 'fr_FR', 'id_ID']
 };
 
 // 添加字符限制常量
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         thead.innerHTML = '';
         currentOrder.forEach(lang => {
             const th = document.createElement('th');
-            th.textContent = lang.toUpperCase();
+            th.textContent = lang;
             thead.appendChild(th);
         });
 
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // 确保所有必要的语言键存在
-            const requiredLanguages = ['zh_CN', 'en_US', 'AR', 'TR', 'pt_BR', 'es_MX', 'TC', 'fr_FR', 'id_ID'];
+            const requiredLanguages = ['zh_CN', 'en_US', 'ar_AE', 'tr_TR', 'pt_BR', 'es_MX', 'zh_TW', 'fr_FR', 'id_ID'];
             const missingLanguages = requiredLanguages.filter(lang => !translations[lang]);
             
             if (missingLanguages.length > 0) {
