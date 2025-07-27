@@ -58,7 +58,7 @@ body {
 .table thead th:nth-child(3) { width: 10%; } /* 操作列 */
 
 /* 结果表格列宽 */
-#resultTable thead th { width: 14.28%; } /* 7列平均分配宽度 */
+#resultTable thead th { width: 11.11%; } /* 9列平均分配宽度 */
 
 .table td {
     border-color: rgba(255, 255, 255, 0.1);
