@@ -27,7 +27,7 @@ const config = {
             maxLength: 2000
         },
         gpt4o: {
-            name: 'GPT-4O',
+            name: 'GPT-4',
             maxLength: 2000
         }
     },
