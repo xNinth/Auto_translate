@@ -380,6 +380,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (error) {
                     console.error(`[翻译日志] 行 ${currentRow + 1} 翻译失败:`, error);
                     showToast(`第 ${currentRow + 1} 行翻译失败: ${error.message}`, 'error');
+                    // 失败行插入占位，保持结果与输入行对齐
+                    const errorPlaceholder = {};
+                    const langs = ['zh_CN', 'en_US', 'ar_AE', 'tr_TR', 'pt_BR', 'es_MX', 'zh_TW', 'fr_FR', 'id_ID', 'ms_MY'];
+                    langs.forEach(lang => { errorPlaceholder[lang] = `[翻译失败]`; });
+                    translations.push({ description, translations: errorPlaceholder });
                 }
                 
                 currentRow++;
