@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <textarea class="form-control description" rows="2" placeholder="请输入说明..."></textarea>
                     </td>
                     <td>
-                        <textarea class="form-control original-text" rows="2"></textarea>
+                        <textarea class="form-control original-text" rows="2">${text}</textarea>
                     </td>
                     <td>
                         <button class="btn btn-danger btn-sm delete-row">
@@ -118,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </button>
                     </td>
                 `;
-                newRow.querySelector('.original-text').value = text;
                 tbody.appendChild(newRow);
             });
 
@@ -200,8 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${apiBaseUrl}${config.ENDPOINTS.translate}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': config.API_TOKEN
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(requestData),
                 signal: AbortSignal.timeout(config.TIMEOUT)
@@ -382,11 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (error) {
                     console.error(`[翻译日志] 行 ${currentRow + 1} 翻译失败:`, error);
                     showToast(`第 ${currentRow + 1} 行翻译失败: ${error.message}`, 'error');
-                    // 失败行插入占位，保持结果与输入行对齐
-                    const errorPlaceholder = {};
-                    const langs = ['zh_CN', 'en_US', 'ar_AE', 'tr_TR', 'pt_BR', 'es_MX', 'zh_TW', 'fr_FR', 'id_ID', 'ms_MY'];
-                    langs.forEach(lang => { errorPlaceholder[lang] = `[翻译失败]`; });
-                    translations.push({ description, translations: errorPlaceholder });
                 }
                 
                 currentRow++;
