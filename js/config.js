@@ -6,8 +6,7 @@ const config = {
     // 模型特定API基础URL
     MODEL_API_URLS: {
         deepseek: 'https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com',
-        gpt4o: 'https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com',
-        grok: 'https://auto-trans2-backend.vercel.app'
+        gpt4o: 'https://1258924718-d2yyrm8l6e.ap-beijing.tencentscf.com'
     },
     
     // API端点
@@ -18,12 +17,8 @@ const config = {
     
     // 翻译模型配置
     models: {
-        grok: {
-            name: 'Grok-3',
-            maxLength: 2000
-        },
         deepseek: {
-            name: 'Deepseek-V3',
+            name: 'Deepseek-V4-Flash',
             maxLength: 2000
         },
         gpt4o: {
