@@ -184,7 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const requestData = {
                 text: originalText,
                 model: selectedModel,
-                description: description // 添加说明字段
+                description: description,
+                api_token: config.API_TOKEN
             };
             
             // 根据模型选择对应的API URL
@@ -200,8 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${apiBaseUrl}${config.ENDPOINTS.translate}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': config.API_TOKEN
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(requestData),
                 signal: AbortSignal.timeout(config.TIMEOUT)
