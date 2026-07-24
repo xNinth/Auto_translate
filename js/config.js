@@ -14,6 +14,9 @@ const config = {
         translate: '/translate',
         health: '/'
     },
+
+    // 接口认证Token
+    API_TOKEN: 'autotrans-internal-2024',
     
     // 翻译模型配置
     models: {
