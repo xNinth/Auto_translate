@@ -7,9 +7,6 @@ const languageOrders = {
     backend: ['zh_CN', 'zh_TW', 'en_US', 'ar_AE', 'tr_TR', 'es_MX', 'pt_BR', 'fr_FR', 'id_ID', 'ms_MY']
 };
 
-// 添加字符限制常量
-const MAX_CHARS_PER_BATCH = 300;
-
 // DOM元素
 document.addEventListener('DOMContentLoaded', () => {
     const inputTable = document.getElementById('inputTable');
@@ -165,132 +162,80 @@ document.addEventListener('DOMContentLoaded', () => {
         setupCellCopyHandlers();
     }
 
-    // 添加取消翻译标志
-    let isTranslationCancelled = false;
+    // 取消翻译控制器
+    let abortController = null;
 
     // 取消翻译函数
     function cancelTranslation() {
-        isTranslationCancelled = true;
+        if (abortController) {
+            abortController.abort();
+            abortController = null;
+        }
         hideLoading();
         showToast('翻译已取消', 'warning');
     }
 
-    // 翻译文本
-    async function translateText(description, originalText, currentRow, totalRows) {
-        try {
-            const selectedModel = modelSelect.value;
-            
-            // 准备请求数据，包含说明字段
-            const requestData = {
-                text: originalText,
-                model: selectedModel,
-                description: description,
-                api_token: config.API_TOKEN
-            };
-            
-            // 根据模型选择对应的API URL
-            const apiBaseUrl = config.MODEL_API_URLS[selectedModel] || config.API_BASE_URL;
-            
-            console.log(`[DEBUG] 发送请求详情:`);
-            console.log(`- 模型: ${selectedModel}`);
-            console.log(`- 原文: "${originalText}"`);
-            console.log(`- 说明: "${description}"`);
-            console.log(`- URL: ${apiBaseUrl}${config.ENDPOINTS.translate}`);
-            
-            // 发送请求
-            const response = await fetch(`${apiBaseUrl}${config.ENDPOINTS.translate}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestData),
-                signal: AbortSignal.timeout(config.TIMEOUT)
-            });
-            
-            console.log(`[DEBUG] 收到响应状态: ${response.status}`);
-            
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-            }
-            
-            // 解析响应数据
-            const responseText = await response.text();
-            console.log(`[DEBUG] 响应内容长度: ${responseText.length} 字符`);
-            
-            let result;
+    // 带重试的fetch请求
+    async function fetchWithRetry(url, options, maxAttempts = config.RETRY.maxAttempts, delay = config.RETRY.delay) {
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                result = JSON.parse(responseText);
-            } catch (e) {
-                console.error(`[DEBUG] JSON解析错误:`, e);
-                throw new Error(`无法解析服务器响应: ${e.message}`);
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+                return response;
+            } catch (error) {
+                if (error.name === 'AbortError') throw error;
+                if (attempt === maxAttempts) throw error;
+                console.log(`[重试] 第${attempt}次失败，${delay}ms后重试...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
             }
-            
-            // 缩短日志输出，只显示关键内容
-            if (result && result.data) {
-                console.log(`[DEBUG] 解析后结果包含data字段:`, {
-                    success: result.success,
-                    timestamp: result.timestamp,
-                    data: {
-                        model: result.data.model,
-                        process_time: result.data.process_time,
-                        translations: Object.keys(result.data.translations || {}).length + " 种语言"
-                    }
-                });
-            } else {
-                console.log(`[DEBUG] 解析后结果结构:`, result ? Object.keys(result) : null);
-            }
-            
-            // 提取正确的翻译数据
-            let translations;
-            if (result.data && result.data.translations) {
-                // 处理嵌套的data结构
-                console.log(`[DEBUG] 检测到嵌套的data结构`);
-                translations = result.data.translations;
-            } else if (result.translations) {
-                // 处理包含translations字段的结构
-                console.log(`[DEBUG] 检测到直接的translations结构`);
-                translations = result.translations;
-            } else if (typeof result === 'object' && result.zh_CN) {
-                // 处理直接返回翻译对象的情况
-                console.log(`[DEBUG] 检测到直接的翻译对象`);
-                translations = result;
-            } else {
-                console.error(`[DEBUG] 无法识别的响应格式`, result);
-                throw new Error('服务器返回了无法识别的数据格式');
-            }
-            
-            // 显示英文翻译结果，确认说明是否生效
-            if (translations.en_US) {
-                console.log(`[DEBUG] 英文翻译结果: "${translations.en_US}"`);
-                console.log(`[DEBUG] 原文: "${originalText}", 说明: "${description}"`);
-            }
-            
-            // 确保所有必要的语言键存在
-            const requiredLanguages = ['zh_CN', 'en_US', 'ar_AE', 'tr_TR', 'pt_BR', 'es_MX', 'zh_TW', 'fr_FR', 'id_ID', 'ms_MY'];
-            const missingLanguages = requiredLanguages.filter(lang => !translations[lang]);
-            
-            if (missingLanguages.length > 0) {
-                console.warn(`[DEBUG] 缺少语言:`, missingLanguages);
-                // 填充缺失的语言，防止渲染错误
-                missingLanguages.forEach(lang => {
-                    translations[lang] = `[缺失: ${lang}]`;
-                });
-            }
-            
-            // 更新进度
-            updateProgress((currentRow + 1) / totalRows * 100);
-            
-            return {
-                description,
-                translations: translations
-            };
-            
-        } catch (error) {
-            console.error('[翻译错误]:', error);
-            showToast(`翻译失败: ${error.message}`, 'error');
-            throw error;
         }
+    }
+
+    // 翻译文本
+    async function translateText(description, originalText, signal) {
+        const selectedModel = modelSelect.value;
+
+        const requestData = {
+            text: originalText,
+            model: selectedModel,
+            description: description,
+            api_token: config.API_TOKEN
+        };
+
+        const apiBaseUrl = config.MODEL_API_URLS[selectedModel] || config.API_BASE_URL;
+
+        const response = await fetchWithRetry(`${apiBaseUrl}${config.ENDPOINTS.translate}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData),
+            signal: signal
+        });
+
+        const responseText = await response.text();
+        const result = JSON.parse(responseText);
+
+        // 提取翻译数据
+        let translations;
+        if (result.data && result.data.translations) {
+            translations = result.data.translations;
+        } else if (result.translations) {
+            translations = result.translations;
+        } else if (typeof result === 'object' && result.zh_CN) {
+            translations = result;
+        } else {
+            throw new Error('服务器返回了无法识别的数据格式');
+        }
+
+        // 填充缺失语言
+        const requiredLanguages = ['zh_CN', 'en_US', 'ar_AE', 'tr_TR', 'pt_BR', 'es_MX', 'zh_TW', 'fr_FR', 'id_ID', 'ms_MY'];
+        requiredLanguages.forEach(lang => {
+            if (!translations[lang]) translations[lang] = `[缺失: ${lang}]`;
+        });
+
+        return { description, translations };
     }
 
     // 添加进度更新函数
@@ -328,79 +273,76 @@ document.addEventListener('DOMContentLoaded', () => {
     async function startTranslation() {
         try {
             showLoading();
-            // 重置进度条和取消标志
             resetProgress();
-            isTranslationCancelled = false;
-            
-            // 更新当前使用的模型名称
+            abortController = new AbortController();
+
             const currentModelName = document.getElementById('currentModelName');
             const selectedModel = modelSelect.value;
             currentModelName.textContent = config.models[selectedModel].name;
-            
-            // 获取所有需要翻译的行
+
             const rows = Array.from(inputTable.querySelectorAll('tbody tr'));
             const totalRows = rows.length;
-            
+
             if (totalRows === 0) {
                 throw new Error('请至少添加一行文本');
             }
-            
-            console.log(`[翻译日志] 开始时间: ${new Date().toLocaleString()}`);
-            console.log(`[翻译日志] 总行数: ${totalRows}`);
-            
-            const translations = [];
-            let currentRow = 0;
-            
-            // 处理每一行
-            for (const row of rows) {
-                if (isTranslationCancelled) {
-                    console.log('[翻译日志] 翻译已取消');
-                    break;
-                }
-                
-                // 获取说明和原文内容
-                const description = row.querySelector('.description').value.trim();
-                const originalText = row.querySelector('.original-text').value.trim();
-                
-                // 记录行数据和说明内容
-                console.log(`[翻译日志] 行 ${currentRow + 1}:`);
-                console.log(`- 原文: "${originalText}"`);
-                console.log(`- 说明: "${description}"`);
-                
-                if (!originalText) {
-                    console.log(`[翻译日志] 跳过空行: ${currentRow + 1}`);
-                    currentRow++;
-                    continue;
-                }
-                
-                try {
-                    // 传递说明和原文到翻译函数
-                    console.log(`[翻译日志] 发送翻译请求，行 ${currentRow + 1}, 说明长度: ${description.length}`);
-                    const result = await translateText(description, originalText, currentRow, totalRows);
-                    translations.push(result);
-                    console.log(`[翻译日志] 行 ${currentRow + 1} 翻译成功`);
-                } catch (error) {
-                    console.error(`[翻译日志] 行 ${currentRow + 1} 翻译失败:`, error);
-                    showToast(`第 ${currentRow + 1} 行翻译失败: ${error.message}`, 'error');
-                    const errorPlaceholder = {};
-                    const langs = ['zh_CN', 'en_US', 'ar_AE', 'tr_TR', 'pt_BR', 'es_MX', 'zh_TW', 'fr_FR', 'id_ID', 'ms_MY'];
-                    langs.forEach(lang => { errorPlaceholder[lang] = `[翻译失败]`; });
-                    translations.push({ description, translations: errorPlaceholder });
-                }
-                
-                currentRow++;
+
+            // 收集所有需要翻译的行数据
+            const tasks = rows.map(row => ({
+                description: row.querySelector('.description').value.trim(),
+                originalText: row.querySelector('.original-text').value.trim()
+            }));
+
+            // 并发翻译（限制3个并发）
+            const concurrency = 3;
+            const translations = new Array(tasks.length).fill(null);
+            let completedCount = 0;
+
+            for (let i = 0; i < tasks.length; i += concurrency) {
+                if (abortController.signal.aborted) break;
+
+                const batch = tasks.slice(i, i + concurrency);
+                const promises = batch.map((task, batchIndex) => {
+                    const index = i + batchIndex;
+                    if (!task.originalText) {
+                        completedCount++;
+                        updateProgress(completedCount / totalRows * 100);
+                        return Promise.resolve(null);
+                    }
+                    return translateText(task.description, task.originalText, abortController.signal)
+                        .then(result => {
+                            translations[index] = result;
+                            completedCount++;
+                            updateProgress(completedCount / totalRows * 100);
+                        })
+                        .catch(error => {
+                            if (error.name === 'AbortError') return;
+                            showToast(`第 ${index + 1} 行翻译失败: ${error.message}`, 'error');
+                            const errorPlaceholder = {};
+                            const langs = ['zh_CN', 'en_US', 'ar_AE', 'tr_TR', 'pt_BR', 'es_MX', 'zh_TW', 'fr_FR', 'id_ID', 'ms_MY'];
+                            langs.forEach(lang => { errorPlaceholder[lang] = '[翻译失败]'; });
+                            translations[index] = { description: task.description, translations: errorPlaceholder };
+                            completedCount++;
+                            updateProgress(completedCount / totalRows * 100);
+                        });
+                });
+
+                await Promise.all(promises);
             }
-            
-            // 更新结果表格
-            if (translations.length > 0) {
-                updateResultTable(translations);
+
+            // 过滤掉空行（null），更新结果表格
+            const validTranslations = translations.filter(t => t !== null);
+            if (validTranslations.length > 0) {
+                updateResultTable(validTranslations);
                 showToast('翻译完成！', 'success');
             }
-            
+
         } catch (error) {
-            console.error('[翻译日志] 翻译过程出错:', error);
-            showToast(error.message, 'error');
+            if (error.name !== 'AbortError') {
+                showToast(error.message, 'error');
+            }
         } finally {
+            abortController = null;
             hideLoading();
         }
     }

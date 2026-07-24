@@ -31,7 +31,7 @@ const config = {
     },
     
     // 翻译批次大小限制
-    MAX_CHARS_PER_BATCH: 300,
+    MAX_CHARS_PER_BATCH: 2000,
     
     // 请求超时时间（毫秒）
     TIMEOUT: 594000, // 594秒超时，略小于后端的600秒
